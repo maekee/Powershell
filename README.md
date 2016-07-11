@@ -1,7 +1,4 @@
 # PowerShell Repository
 
-This repository will consist of PowerShell scripts or modules that I've created for the following products:
-
-- Active Directory
-- System Center Service Manager
-- System Center Configuration Manager
+This repository will consist of PowerShell scripts/functions/modules and hopefully grow as time goes by.
+If i create something generic that i can share, i will put it here.
