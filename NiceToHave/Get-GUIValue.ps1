@@ -1,3 +1,5 @@
+## Very simple GUI popup for getting a value back to PowerShell
+
 Function Get-GUIValue{
     [CmdletBinding()]
     param([string]$Title,[string]$Description)
