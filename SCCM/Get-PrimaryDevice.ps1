@@ -7,7 +7,7 @@ Function Get-PrimaryDevice {
         [string]$SCCMSiteCode,
         [string]$SCCMSiteServer)
 
-    TRY{$DataReturnedFromWMI = Get-WmiObject -Namespace "Root\SMS\Site_$SCCMSiteCode" -Class "SMS_UserMachineRelationship" -Filter "(UniqueUserName='ppm\\$Username')" -ComputerName $SCCMSiteServer -ErrorAction Stop }
+    TRY{$DataReturnedFromWMI = Get-WmiObject -Namespace "Root\SMS\Site_$SCCMSiteCode" -Class "SMS_UserMachineRelationship" -Filter "(UniqueUserName='$($env:USERDOMAIN)\\$Username')" -ComputerName $SCCMSiteServer -ErrorAction Stop }
     CATCH{ Write-Warning "Problem occurred while getting data from WMI. Exception: $($_.Exception.Message)" }
 
     $ReturnFromFunction = @($DataReturnedFromWMI | Where {$_.ResourceClientType -eq "1" -AND $_.IsActive -eq $true})
