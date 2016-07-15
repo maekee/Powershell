@@ -27,14 +27,15 @@ Function Set-FileDateProperty {
         [ValidateSet('CreationTime','LastAccessTime','LastWriteTime')]
         [string]$Property,
         [string]$NewTimeStamp = (Get-Date)
-   
     )
-
+    
+    #Validating Parameters (Yes, i know it could be done in the parameter section)
     $DateFormatCheck = TRY{ $(Get-Date $NewTimeStamp -ErrorAction Stop).GetType().FullName -eq 'System.DateTime' }CATCH{ $False}
     IF(!(Test-Path $Path)){ Write-Warning "$Path not found";Break }
     IF((Get-Item $Path).PSIsContainer){ Write-Warning "$Path is a folder, only files can be modified in this way";Break }
     IF(!($DateFormatCheck)){ Write-Warning "$NewTimeStamp not valid DateTime format";Break }
 
+    #Verbose Logging
     Write-Verbose "Path: $Path"
     Write-Verbose "Property: $Property"
     Write-Verbose "NewTimeStamp: $(Get-Date -format "yyyy-MM-dd HH:mm")"
