@@ -19,11 +19,10 @@ Function Get-Pattern{
 Function Get-ValidateScript{
 	[CmdletBinding()]
 	param(
-	[ValidateScript(
-  	IF( $_ -notlike "tubb*){ $True }
-  	ELSE{ Throw "$_ is not valid" }
-	)]
-	  [string]$ComputerName
+	    [ValidateScript({
+            IF( $_ -like "a00*"){ $True }
+            ELSE{ Throw "$_ is not valid" } 
+        })][string]$ComputerName
 	)
 	## Nice replacement for RegEx with ability to create custom error messages
 }
@@ -49,7 +48,7 @@ Function Get-Range{
 Function Get-Set{
 	[CmdletBinding()]
 	param(
-	[ValidateSet('sweden'|'norway'|'denmark')]
+	[ValidateSet('sweden','norway','denmark')]
 	  [string]$Value
 	)
 	## only the three countries is allowed, Tab Completion works
@@ -59,7 +58,7 @@ Function Get-NotNullOrEmpty{
 	[CmdletBinding()]
 	param(
 	[ValidateNotNullOrEmpty]
-	[string]Value
+	[string]$Value
 	)
 	## Null or Empty not allowed. Alternative is to use mandatory parameter
 }
@@ -68,3 +67,4 @@ Function Get-Weekday{
   param([System.DayOfWeek]$Weekday)
   "You chose $Weekday"
 }
+#Getting Weekdays from .NET but working as a ValidateSet
