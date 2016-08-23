@@ -34,5 +34,16 @@ param(
         #There is no limit to the number of aliases that you can assign to a parameter
 )
 
+#Lets mesh them together:
+param(
+    [Alias("PSPath")]
+    [Parameter(Mandatory=$true, Position=0, ParameterSetName="LiteralPath", 
+                ValueFromPipelineByPropertyName=$true,
+                HelpMessage="Path to ...")]
+    [ValidateNotNullOrEmpty()]
+    [string[]]
+    $LiteralPath    
+)
+
 #More Info here: https://technet.microsoft.com/en-us/library/hh847743.aspx
 #Or here: https://msdn.microsoft.com/en-us/library/ms714348(v=vs.85).aspx
