@@ -7,7 +7,7 @@ $myFirstHash = @{}
 ## They are defined almost the same as an array that uses parenthesis e.g. @classicArray = @()
 ## You can add data to the hashtable like this...
 
-$myFirstHash.Add("Michael","Stockholm")
+$myFirstHash.Add("Micke","Stockholm")
 
 ## or with variables
 $key = "Torgny"
@@ -16,12 +16,17 @@ $myFirstHash.Add($key,$value)
 
 ## You can also create the hashtable with pre-populated keys and values..
 $myFirstHash = @{
-  Michael = "Stockholm"
+  Micke = "Stockholm"
   Torgny = "Malmö"
 }
 
 ## Or why not a one-liner with semicolons
-$myFirstHash = @{ Michael = "Stockholm" ; Torgny = "Malmö" }
+$myFirstHash = @{ Micke = "Stockholm" ; Torgny = "Malmö" }
+
+## Or why not like this? (Keys will be added if they do not exist, if they exists they are updated)
+$myFirstHash = @{}
+$myFirstHash.Micke = "Stockholm"
+$myFirstHash.Torgny = "Malmö"
 
 ## Once data is in there, you probably want to go get the data. Can be done in more than one way.
 ## Using the Key to get the value back:
@@ -47,4 +52,8 @@ $myADUserHash.maekee.DistinguishedName
 $myHash.keys | foreach {"do this"}
 
 ## If you want both keys and values you need to use the method GetEnumerator(), like this:
-...
+$myHash.GetEnumerator() | foreach {"$($_.key) is the Key and $($_.value) is the value"}
+
+## So, we have a hashtable with some key/value pairs
+$per @@
+#Hashtable inception? You can place hash tables inside an hashtable!
