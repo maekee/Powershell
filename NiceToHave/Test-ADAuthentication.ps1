@@ -5,7 +5,7 @@
 
 Function Test-ADAuthentication {
   param(
-     [Parameter(Mandatory=$true)][string]$DomainBackslashUsername
+     [Parameter(Mandatory=$true)][string]$DomainBackslashUsername,
      [Parameter(Mandatory=$true)][string]$DaPass
   )
     if($DomainBackslashUsername | Select-String -AllMatches -Pattern '^[a-z0-9]{1,15}\\[\sa-z0-9._-]{1,104}$'){
