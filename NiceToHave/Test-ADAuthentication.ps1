@@ -1,6 +1,7 @@
 #This function validates username and password, multidomain support. (Have tested in parent->childdomain scenario)
 #Added RegEx så that only Domain\Username syntax (Downlevel domain-name) is supported.
-#Function returns False both if user is not found and if password is incorrect.
+#Function returns False both if user is not found and if password is incorrect, this could be fixed with user lookup before.
+#This function does not work (always returns false) if "Smart card is required for interactive logon" is set
 
 Function Test-ADAuthentication {
   param($DomainBackslashUsername,$DaPass)
