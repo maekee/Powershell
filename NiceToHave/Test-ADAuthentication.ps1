@@ -10,3 +10,6 @@ Function Test-ADAuthentication {
       }
     else{ Write-Warning "`'$DomainBackslashUsername`' not allowed syntax, should be DOMAIN\USERNAME" }
 }
+
+#Called with:
+Test-ADAuthentication -DomainBackslashUsername 'DoMAIN\Superman' -DaPass 'P@ssw0rdtoValidat3'
