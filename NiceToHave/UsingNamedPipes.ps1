@@ -6,6 +6,7 @@
 ## So named pipes are actually just files on a hard drive which persist until there are no
 ## remaining handles to the file, at which point the file is deleted by Windows.
 ## The named pipe directory is located at: \\<machine_address>\pipe\<pipe_name>
+## Nice website: https://labs.portcullis.co.uk/blog/windows-named-pipes-there-and-back-again/
 
 Function Start-NamedPipeListeningServer {
     [CmdletBinding()]
