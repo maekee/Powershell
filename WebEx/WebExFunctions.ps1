@@ -1,6 +1,8 @@
 ## This PowerShell code can be updated even more with stuff like comment based help, improved credential handling,
 ## separate parameters for the global variables and so on. But i wanted to share this before i move on to the next assignment so
 ## everyone that is interested and struggles with this can get some help. Maybe i will come back and fix the missing things.
+## Functions creating, updating or deleting returnes True/False if they succeeded or not, so you can use it when calling the function.
+## Some of them have verbose logging available, but this can be increased if needed.
 ## Your feedback and improvements are highly welcome
 ## Enjoy //Maekee
 
