@@ -3,6 +3,10 @@
 ## everyone that is interested and struggles with this can get some help. Maybe i will come back and fix the missing things.
 ## Functions creating, updating or deleting returnes True/False if they succeeded or not, so you can use it when calling the function.
 ## Some of them have verbose logging available, but this can be increased if needed.
+## If you need to dig in yourself, these three links helped me a lot:
+## Cisco WebEx XML API Reference Guide (HTML): https://developer.cisco.com/media/webex-xml-api/Preface.html
+## Cisco WebEx XML API Reference Guide (PDF): https://developer.cisco.com/fileMedia/download/1d70807a-6431-4a80-b13a-aa8faa4575b7
+## Cisco WebEx XML API schema (with search function): https://developer.cisco.com/media/webex-xml-api/schemas/index.html
 ## Your feedback and improvements are highly welcome
 ## Enjoy //Maekee
 
