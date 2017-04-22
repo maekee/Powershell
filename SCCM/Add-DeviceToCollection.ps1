@@ -52,7 +52,7 @@ Function Add-DeviceToCollection{
     )
 
     #region Declare Credentials, default parameters and variables
-        $EncryptedActionAccountPassword = $SCCMPassword | ConvertTo-SecureString -AsPlainText -Force
+        $EncryptedActionAccountPassword = $ActionAccountPassword | ConvertTo-SecureString -AsPlainText -Force
         $Credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $ActionAccountUserName,$EncryptedActionAccountPassword
 
         $extragwmiParameters = [ordered]@{
