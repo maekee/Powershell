@@ -1,4 +1,4 @@
-﻿Function Add-ResourceToCollection{
+Function Add-DeviceToCollection{
 <# 
 .SYNOPSIS
     Adds a computer (device) to a SCCM collection
