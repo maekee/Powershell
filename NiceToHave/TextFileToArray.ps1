@@ -4,6 +4,9 @@
 #Column names, number of columns, values and number of rows can be changed.
 #The black regex magic is to support column names and values with spaces if double quotation marks is used (i.e "").
 
+#Update: Have noticed that if files are very big (100k lines) the split on the regex slows the script down,
+#so if a space (' ') is enough on the split, use that.
+
 #Example:
 #column1 column2 column3
 #value001 value002 value003
