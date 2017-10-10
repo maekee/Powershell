@@ -6,7 +6,7 @@
         [switch]$Force
     )
 
-    $CurrentIndex = Get-ElasticSearchIndex -IndexName $IndexName
+    $CurrentIndex = Get-ESIndex -IndexName $IndexName
     if($CurrentIndex){
         if($CurrentIndex.status -ne "open" -or $Force){
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Opening index $IndexName..."
