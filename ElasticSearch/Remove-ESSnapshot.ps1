@@ -6,10 +6,10 @@
         [Parameter(Mandatory=$true)]$SnapshotName
     )
 
-    $SnapshotRepos = @(Get-ElasticSearchSnapshotRepository)
+    $SnapshotRepos = @(Get-ESSnapshotRepository)
     if($SnapshotRepos.Count -ne 0 -and $SnapshotRepos.Name -contains $SnapshotRepository){
         
-        $RepoSnapshots = @(Get-ElasticSearchSnapshots -SnapshotRepository $SnapshotRepository)
+        $RepoSnapshots = @(Get-ESSnapshots -SnapshotRepository $SnapshotRepository)
         if($RepoSnapshots.snapshot -contains $SnapshotName){
            try{
                 Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removing snapshot $SnapshotName from repository $SnapshotRepository..."
