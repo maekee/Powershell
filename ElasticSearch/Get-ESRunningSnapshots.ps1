@@ -7,7 +7,7 @@
     
     $FullUri = "$ElasticSearchUri/_snapshot/$SnapshotRepository/_current"
     
-    if((Get-ElasticSearchSnapshotRepository).Name -contains $SnapshotRepository){
+    if((Get-ESSnapshotRepository).Name -contains $SnapshotRepository){
         try{
             $runningSnapsList = Invoke-RestMethod -Method Get -Uri $FullUri -ContentType 'application/json' -ErrorAction Stop
             if($runningSnapsList.snapshots.count -gt 0){
