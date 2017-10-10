@@ -9,8 +9,8 @@
         [switch]$DoNotWaitForCompletion
     )
     
-    if((Get-ElasticSearchSnapshotRepository).Name -contains $SnapshotRepository){
-        $RepoSnapshots = @(Get-ElasticSearchSnapshots -SnapshotRepository $SnapshotRepository)
+    if((Get-ESSnapshotRepository).Name -contains $SnapshotRepository){
+        $RepoSnapshots = @(Get-ESSnapshots -SnapshotRepository $SnapshotRepository)
         if($RepoSnapshots.snapshot -contains $SnapshotName){
 
             $FullUri = "${ElasticSearchUri}/_snapshot/${SnapshotRepository}/${SnapshotName}/_restore"
