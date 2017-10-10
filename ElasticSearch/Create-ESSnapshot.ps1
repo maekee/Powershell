@@ -16,7 +16,7 @@
             if(!($DoNotWaitForCompletion)){$FullUri = "${FullUri}?wait_for_completion=true"}
             else{ $FullUri = "${FullUri}?wait_for_completion=false"}
 
-            $RepoSnapshots = @(Get-ElasticSearchSnapshots -SnapshotRepository $SnapshotRepository)
+            $RepoSnapshots = @(Get-ESSnapshots -SnapshotRepository $SnapshotRepository)
             if($RepoSnapshots.snapshot -notcontains $SnapshotName){
 
                 if($IndicesToSnapShot){
