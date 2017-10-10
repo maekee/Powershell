@@ -8,7 +8,7 @@
         [switch]$DoNotWaitForCompletion
     )
 
-    $SnapshotRepos = @(Get-ElasticSearchSnapshotRepository)
+    $SnapshotRepos = @(Get-ESSnapshotRepository)
     
     if($SnapshotRepos.Count -ne 0){
         if($SnapshotRepos.Name -contains $SnapshotRepository){
