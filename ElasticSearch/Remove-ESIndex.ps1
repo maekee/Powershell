@@ -6,7 +6,7 @@
     )
 
     try{
-        $CurrentIndex = Get-ElasticSearchIndex -IndexName $IndexName
+        $CurrentIndex = Get-ESIndex -IndexName $IndexName
         if($CurrentIndex){
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removing index $IndexName..."
             $removalOutput = Invoke-WebRequest -Method Delete -Uri "$($ElasticSearchUri)/${IndexName}" -ContentType application/json -ErrorAction Stop
