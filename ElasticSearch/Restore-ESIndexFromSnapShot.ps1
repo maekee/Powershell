@@ -35,19 +35,19 @@
                 if($IndicesToRestore){
                     Write-Verbose "Closing indices specified: $($IndicesToRestore -join ", ")"
                     $IndicesToRestore | Foreach {
-                        if(Get-ElasticSearchIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_){
-                            Close-ElasticSearchIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_ -Force
+                        if(Get-ESIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_){
+                            Close-ESIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_ -Force
                         }
                         else{ Write-Verbose "Index $_ is missing, no close operation needed" }
                     }
                 }
                 else{
                     #IndicesToRestore parameter is NOT used = close all indices in snapshot
-                    $SnapShotIndices = (Get-ElasticSearchSnapshots -ElasticSearchUri $ElasticSearchUri -SnapshotRepository $SnapshotRepository | Where {$_.snapshot -eq $SnapshotName}).indices
+                    $SnapShotIndices = (Get-ESSnapshots -ElasticSearchUri $ElasticSearchUri -SnapshotRepository $SnapshotRepository | Where {$_.snapshot -eq $SnapshotName}).indices
                     Write-Verbose "Closing all incices in snapshot $($SnapshotName): $($SnapShotIndices -join ", ")"
                     $SnapShotIndices | Foreach {
-                        if(Get-ElasticSearchIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_){
-                            Close-ElasticSearchIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_ -Force
+                        if(Get-ESIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_){
+                            Close-ESIndex -ElasticSearchUri $ElasticSearchUri -IndexName $_ -Force
                         }
                         else{ Write-Verbose "Index $_ is missing, no close operation needed" }
                     }
@@ -67,4 +67,4 @@
         else{ Write-Warning "Snapshot $SnapshotName not found in repository $SnapshotRepository" }
     }
     else{ Write-Warning "ElasticSearch snapshot repository $SnapshotRepository not found" }
-}
+} 
