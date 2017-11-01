@@ -13,7 +13,7 @@
             if([System.Diagnostics.EventLog]::SourceExists($SourceName)){ Write-Verbose "Source `"$SourceName`" already exists" }
             else{
                 [System.Diagnostics.EventLog]::CreateEventSource($SourceName, $LogName)
-                Write-Verbose "Successfully created source $SourceName"
+                Write-Verbose "Successfully created source $SourceName and registred with log $LogName"
             }
         }
     }
