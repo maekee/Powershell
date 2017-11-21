@@ -5,7 +5,7 @@
         $NodeName
     )
 
-    $JsonData = Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all" -Method Get -ContentType application/json
+    $JsonData = Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all" -Method Get -ContentType application/json -UseBasicParsing
     $JsonObj = ConvertFrom-Json -InputObject $JsonData.Content
     
     if( @($JsonObj.nodes).count -ne 0 ){
