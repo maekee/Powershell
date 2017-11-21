@@ -10,7 +10,7 @@
     if($CurrentIndex){
         if($CurrentIndex.status -ne "close" -or $Force){
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Closing index $IndexName..."
-            $closeOutput = Invoke-WebRequest -Method Post -Uri "$ElasticSearchUri/$IndexName/_close" -ContentType application/json
+            $closeOutput = Invoke-WebRequest -Method Post -Uri "$ElasticSearchUri/$IndexName/_close" -ContentType application/json -UseBasicParsing
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Close request complete with status: $($closeOutput.content)"
         }
         else{ Write-Warning "$IndexName is already in status close, use the force parameter if you still want to request the close index operation" }
