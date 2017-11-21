@@ -10,7 +10,7 @@
     $FullUri = "$ElasticSearchUri/_cat/indices?format=json"
 
     try{
-        $APIoutput = Invoke-WebRequest -Method Get -Uri $FullUri -ContentType application/json -ErrorAction Stop
+        $APIoutput = Invoke-WebRequest -Method Get -Uri $FullUri -ContentType application/json -UseBasicParsing -ErrorAction Stop
         $JsonObj = ConvertFrom-Json -InputObject $APIoutput -ErrorAction Stop
         $JsonObj = $JsonObj | Sort index
     }
