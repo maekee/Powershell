@@ -7,7 +7,7 @@
         [switch]$IncludeKibanaIndex
     )
 
-    $AllShards = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_cat/shards?format=json" -Method Get -ContentType "application/json").Content
+    $AllShards = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_cat/shards?format=json" -Method Get -ContentType "application/json" -UseBasicParsing).Content
 
     #Filtering output
     if(!($IncludeKibanaIndex)){ $AllShards = $AllShards | Where {$_.index -ne ".kibana" }}
