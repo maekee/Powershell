@@ -2,7 +2,7 @@
     [CmdletBinding()]
     param($ElasticSearchUri = 'http://localhost:9200')
     
-    $SnapShots = @((ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "${ElasticSearchUri}/_snapshot/" -Method Get -ContentType application/json).Content))
+    $SnapShots = @((ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "${ElasticSearchUri}/_snapshot/" -Method Get -ContentType application/json -UseBasicParsing).Content))
     
     if($SnapShots.Count -ne 0){
         $SnapShotList = @($SnapShots | Get-Member | Where {$_.Membertype -eq "NoteProperty"}).Name
