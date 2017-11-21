@@ -9,7 +9,7 @@
         $CurrentIndex = Get-ESIndex -IndexName $IndexName
         if($CurrentIndex){
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removing index $IndexName..."
-            $removalOutput = Invoke-WebRequest -Method Delete -Uri "$($ElasticSearchUri)/${IndexName}" -ContentType application/json -ErrorAction Stop
+            $removalOutput = Invoke-WebRequest -Method Delete -Uri "$($ElasticSearchUri)/${IndexName}" -ContentType application/json -UseBasicParsing -ErrorAction Stop
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removal request complete with status: $($removalOutput.content)"
         }
         else{ Write-Warning "Elasticsearch index $IndexName not found" }
