@@ -4,7 +4,7 @@
         $DSLQuery
     )
 
-    $SearchResults = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_search" -Method Post -Body $DSLQuery -ContentType "application/json").Content)
+    $SearchResults = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_search" -Method Post -Body $DSLQuery -ContentType "application/json" -UseBasicParsing).Content)
     
     New-Object PSObject -Property @{
         'Total' = $SearchResults.hits.total
