@@ -9,7 +9,7 @@
     
     if((Get-ESSnapshotRepository).Name -contains $SnapshotRepository){
         try{
-            $runningSnapsList = Invoke-RestMethod -Method Get -Uri $FullUri -ContentType 'application/json' -ErrorAction Stop
+            $runningSnapsList = Invoke-RestMethod -Method Get -Uri $FullUri -ContentType 'application/json' -UseBasicParsing -ErrorAction Stop
             if($runningSnapsList.snapshots.count -gt 0){
                 $runningSnapsList.snapshots
             }
