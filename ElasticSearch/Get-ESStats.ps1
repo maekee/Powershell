@@ -20,6 +20,6 @@
         #long it has been waiting in the queue, and what action it represents.
     }
 
-    $response = Invoke-WebRequest -Uri $FullUri -Method Get -ContentType 'application/json'
+    $response = Invoke-WebRequest -Uri $FullUri -Method Get -ContentType 'application/json' -UseBasicParsing
     ConvertFrom-Json -InputObject $response.Content
 }
