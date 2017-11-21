@@ -18,7 +18,7 @@
     $jsonbody = $hashbody | ConvertTo-Json
 
     $FullUri = "$ElasticSearchUri/_cluster/settings"
-    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop
+    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop -UseBasicParsing
         
     if($ShardSettingOutput.acknowledged){ Write-Verbose "Successfully disabled shard allocation $LogText" }
     else{ Write-Warning "Did not recieve a acknowledgement from elasticsearch, verify state" }
