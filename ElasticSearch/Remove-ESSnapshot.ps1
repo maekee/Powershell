@@ -15,7 +15,7 @@
                 Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removing snapshot $SnapshotName from repository $SnapshotRepository..."
                 Write-Verbose "Removing all files that are associated with snapshot $SnapshotName and not used by any other snapshots."
                 
-                try{ $RemovalResults = Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/${SnapshotName}" -Method Delete -ErrorAction Stop }
+                try{ $RemovalResults = Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/${SnapshotName}" -Method Delete -UseBasicParsing -ErrorAction Stop }
                 catch{ Write-Warning $_.Exception.Message }
                 
                 Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Snapshot removal status response: $($RemovalResults.Content)"
