@@ -58,7 +58,7 @@
                 if($IndicesToRestore){ Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Restoring selected indices $($IndicesToRestore -join ',') from snapshot $SnapshotName to repository $SnapshotRepository..." }
                 else{ Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Restoring all indices from snapshot $SnapshotName to repository $SnapshotRepository..." }
                 
-                $SnapShotState = Invoke-RestMethod -Method Post -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop
+                $SnapShotState = Invoke-RestMethod -Method Post -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -UseBasicParsing -ErrorAction Stop
                 
                 Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Restored Shards: Total: $($SnapShotState.snapshot.shards.total), failed: $($SnapShotState.snapshot.shards.failed), successful: $($SnapShotState.snapshot.shards.successful)"
             }
