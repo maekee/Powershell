@@ -2,8 +2,8 @@
     [CmdletBinding()]
     param ( $ElasticSearchUri = 'http://localhost:9200' )
 
-    $ClusterData = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri $ElasticSearchUri -Method Get -ContentType "application/json").Content
-    $NodesObj = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all/name,version" -Method Get -ContentType "application/json").Content
+    $ClusterData = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri $ElasticSearchUri -Method Get -ContentType "application/json" -UseBasicParsing).Content
+    $NodesObj = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all/name,version" -Method Get -ContentType "application/json" -UseBasicParsing).Content
     $NodesIdList = @($NodesObj.nodes | Get-Member | Where {$_.Membertype -eq "NoteProperty"}).Name
 
     $HashNodes = @{}
