@@ -6,7 +6,7 @@
     )
 
     if((Get-ESSnapshotRepository).Name -contains $SnapshotRepository){
-        (ConvertFrom-Json -InputObject ( Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/_all" -Method Get ).Content).snapshots
+        (ConvertFrom-Json -InputObject ( Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/_all" -Method Get -UseBasicParsing).Content).snapshots
     }
     else{ Write-Warning "ElasticSearch snapshot repository $SnapshotRepository not found" }
 }
