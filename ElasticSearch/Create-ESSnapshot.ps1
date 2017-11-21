@@ -31,7 +31,7 @@
                 try{
                     Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Creating snapshot $SnapshotName in repository $SnapshotRepository..."
                     
-                    try{$SnapShotState = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop}
+                    try{$SnapShotState = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop -UseBasicParsing}
                     catch{ Write-Warning $_.Exception.Message }
                     
                     if(!($DoNotWaitForCompletion)){
