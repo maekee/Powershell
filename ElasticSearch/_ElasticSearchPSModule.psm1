@@ -1,11 +1,11 @@
- Function Get-ESClusterNodes{
+Function Get-ESClusterNodes{
     [CmdletBinding()]
     param(
         $ElasticSearchUri = 'http://localhost:9200',
         $NodeName
     )
 
-    $JsonData = Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all" -Method Get -ContentType application/json
+    $JsonData = Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all" -Method Get -ContentType application/json -UseBasicParsing
     $JsonObj = ConvertFrom-Json -InputObject $JsonData.Content
     
     if( @($JsonObj.nodes).count -ne 0 ){
@@ -23,8 +23,8 @@ Function Get-ESVersion {
     [CmdletBinding()]
     param ( $ElasticSearchUri = 'http://localhost:9200' )
 
-    $ClusterData = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri $ElasticSearchUri -Method Get -ContentType "application/json").Content
-    $NodesObj = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all/name,version" -Method Get -ContentType "application/json").Content
+    $ClusterData = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri $ElasticSearchUri -Method Get -ContentType "application/json" -UseBasicParsing).Content
+    $NodesObj = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_nodes/_all/name,version" -Method Get -ContentType "application/json" -UseBasicParsing).Content
     $NodesIdList = @($NodesObj.nodes | Get-Member | Where {$_.Membertype -eq "NoteProperty"}).Name
 
     $HashNodes = @{}
@@ -54,7 +54,7 @@ Function Get-ESShards {
         [switch]$IncludeKibanaIndex
     )
 
-    $AllShards = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_cat/shards?format=json" -Method Get -ContentType "application/json").Content
+    $AllShards = ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_cat/shards?format=json" -Method Get -ContentType "application/json" -UseBasicParsing).Content
 
     #Filtering output
     if(!($IncludeKibanaIndex)){ $AllShards = $AllShards | Where {$_.index -ne ".kibana" }}
@@ -85,7 +85,7 @@ Function Disable-ESShardAllocation {
     $jsonbody = $hashbody | ConvertTo-Json
 
     $FullUri = "$ElasticSearchUri/_cluster/settings"
-    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop
+    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -UseBasicParsing -ErrorAction Stop
         
     if($ShardSettingOutput.acknowledged){ Write-Verbose "Successfully disabled shard allocation $LogText" }
     else{ Write-Warning "Did not recieve a acknowledgement from elasticsearch, verify state" }
@@ -110,7 +110,7 @@ Function Enable-ESShardAllocation {
     $jsonbody = $hashbody | ConvertTo-Json
 
     $FullUri = "$ElasticSearchUri/_cluster/settings"
-    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop
+    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -UseBasicParsing -ErrorAction Stop
         
     if($ShardSettingOutput.acknowledged){ Write-Verbose "Successfully enabled shard allocation $LogText" }
     else{ Write-Warning "Did not recieve a acknowledgement from elasticsearch, verify state" }
@@ -126,7 +126,7 @@ Function Reset-ESShardAllocation{
     elseif($SettingType -eq 'Persistent'){ $jsonbody = '{"persistent":  {"cluster.routing.allocation.enable":  null}}' }
     else{ $jsonbody = '{"transient":  {"cluster.routing.allocation.enable":  null},"persistent":  {"cluster.routing.allocation.enable":  null}}' }
 
-    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri "$ElasticSearchUri/_cluster/settings" -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop
+    $ShardSettingOutput = Invoke-RestMethod -Method Put -Uri "$ElasticSearchUri/_cluster/settings" -ContentType 'application/json' -Body $jsonbody -UseBasicParsing -ErrorAction Stop
 
     if($ShardSettingOutput.acknowledged){ Write-Verbose "Successfully reset shard allocation settings" }
     else{ Write-Warning "Did not recieve a acknowledgement from elasticsearch, verify state" }
@@ -154,7 +154,7 @@ Function Get-ESStats{
         #long it has been waiting in the queue, and what action it represents.
     }
 
-    $response = Invoke-WebRequest -Uri $FullUri -Method Get -ContentType 'application/json'
+    $response = Invoke-WebRequest -Uri $FullUri -Method Get -ContentType 'application/json' -UseBasicParsing
     ConvertFrom-Json -InputObject $response.Content
 }
 
@@ -170,7 +170,7 @@ Function Get-ESIndex {
     $FullUri = "$ElasticSearchUri/_cat/indices?format=json"
 
     try{
-        $APIoutput = Invoke-WebRequest -Method Get -Uri $FullUri -ContentType application/json -ErrorAction Stop
+        $APIoutput = Invoke-WebRequest -Method Get -Uri $FullUri -ContentType application/json -UseBasicParsing -ErrorAction Stop
         $JsonObj = ConvertFrom-Json -InputObject $APIoutput -ErrorAction Stop
         $JsonObj = $JsonObj | Sort index
     }
@@ -194,7 +194,7 @@ Function Close-ESIndex {
     if($CurrentIndex){
         if($CurrentIndex.status -ne "close" -or $Force){
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Closing index $IndexName..."
-            $closeOutput = Invoke-WebRequest -Method Post -Uri "$ElasticSearchUri/$IndexName/_close" -ContentType application/json
+            $closeOutput = Invoke-WebRequest -Method Post -Uri "$ElasticSearchUri/$IndexName/_close" -ContentType application/json -UseBasicParsing
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Close request complete with status: $($closeOutput.content)"
         }
         else{ Write-Warning "$IndexName is already in status close, use the force parameter if you still want to request the close index operation" }
@@ -214,7 +214,7 @@ Function Open-ESIndex {
     if($CurrentIndex){
         if($CurrentIndex.status -ne "open" -or $Force){
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Opening index $IndexName..."
-            $closeOutput = Invoke-WebRequest -Method Post -Uri "$ElasticSearchUri/$IndexName/_open" -ContentType application/json
+            $closeOutput = Invoke-WebRequest -Method Post -Uri "$ElasticSearchUri/$IndexName/_open" -ContentType application/json -UseBasicParsing
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Open request complete with status: $($closeOutput.content)"
         }
         else{ Write-Warning "$IndexName is already in status open, use the force parameter if you still want to request the open index operation" }
@@ -233,7 +233,7 @@ Function Remove-ESIndex {
         $CurrentIndex = Get-ESIndex -IndexName $IndexName
         if($CurrentIndex){
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removing index $IndexName..."
-            $removalOutput = Invoke-WebRequest -Method Delete -Uri "$($ElasticSearchUri)/${IndexName}" -ContentType application/json -ErrorAction Stop
+            $removalOutput = Invoke-WebRequest -Method Delete -Uri "$($ElasticSearchUri)/${IndexName}" -ContentType application/json -UseBasicParsing -ErrorAction Stop
             Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removal request complete with status: $($removalOutput.content)"
         }
         else{ Write-Warning "Elasticsearch index $IndexName not found" }
@@ -245,13 +245,13 @@ Function Get-ESIndexTemplates{
     [CmdletBinding()]
     param($ElasticSearchUri = 'http://localhost:9200')
 
-    $TemplateData = Invoke-WebRequest -Uri "$ElasticSearchUri/_template" -Method Get -ContentType application/json
+    $TemplateData = Invoke-WebRequest -Uri "$ElasticSearchUri/_template" -Method Get -ContentType application/json -UseBasicParsing
     $TemplateObj = @(ConvertFrom-Json -InputObject $TemplateData.Content)
 
     if($TemplateObj.Count -ne 0){
         $TemplateList = @($TemplateObj | Get-Member | Where {$_.Membertype -eq "NoteProperty"}).Name
         $TemplateList | foreach {     
-            $CurrentObj = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_template" -Method Get -ContentType application/json).Content).$_
+            $CurrentObj = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_template" -Method Get -ContentType application/json -UseBasicParsing).Content).$_
             [PSCustomObject]@{ Name = $_;Order = $CurrentObj.order;Template = $CurrentObj.template;Settings = $CurrentObj.settings;Mappings = $CurrentObj.mappings;Aliases = $CurrentObj.aliases}
         }
     }
@@ -262,12 +262,12 @@ Function Get-ESSnapshotRepository {
     [CmdletBinding()]
     param($ElasticSearchUri = 'http://localhost:9200')
     
-    $SnapShots = @((ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "${ElasticSearchUri}/_snapshot/" -Method Get -ContentType application/json).Content))
+    $SnapShots = @((ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "${ElasticSearchUri}/_snapshot/" -Method Get -ContentType application/json -UseBasicParsing).Content))
     
     if($SnapShots.Count -ne 0){
         $SnapShotList = @($SnapShots | Get-Member | Where {$_.Membertype -eq "NoteProperty"}).Name
         $SnapShotList | foreach {     
-            $CurrentObj = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "${ElasticSearchUri}/_snapshot/" -Method Get)).$_
+            $CurrentObj = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "${ElasticSearchUri}/_snapshot/" -Method Get -UseBasicParsing)).$_
             [PSCustomObject]@{ Name = $_;Type = $CurrentObj.type;Settings = $CurrentObj.settings}
         }
     }
@@ -281,7 +281,7 @@ Function Get-ESSnapshots{
     )
 
     if((Get-ESSnapshotRepository).Name -contains $SnapshotRepository){
-        (ConvertFrom-Json -InputObject ( Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/_all" -Method Get ).Content).snapshots
+        (ConvertFrom-Json -InputObject ( Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/_all" -Method Get -UseBasicParsing).Content).snapshots
     }
     else{ Write-Warning "ElasticSearch snapshot repository $SnapshotRepository not found" }
 }
@@ -318,7 +318,7 @@ Function Create-ESSnapshot {
                 try{
                     Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Creating snapshot $SnapshotName in repository $SnapshotRepository..."
                     
-                    try{$SnapShotState = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop}
+                    try{$SnapShotState = Invoke-RestMethod -Method Put -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -UseBasicParsing -ErrorAction Stop}
                     catch{ Write-Warning $_.Exception.Message }
                     
                     if(!($DoNotWaitForCompletion)){
@@ -351,7 +351,7 @@ Function Remove-ESSnapshot {
                 Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Removing snapshot $SnapshotName from repository $SnapshotRepository..."
                 Write-Verbose "Removing all files that are associated with snapshot $SnapshotName and not used by any other snapshots."
                 
-                try{ $RemovalResults = Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/${SnapshotName}" -Method Delete -ErrorAction Stop }
+                try{ $RemovalResults = Invoke-WebRequest -Uri "$ElasticSearchUri/_snapshot/$SnapshotRepository/${SnapshotName}" -Method Delete -UseBasicParsing -ErrorAction Stop }
                 catch{ Write-Warning $_.Exception.Message }
                 
                 Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Snapshot removal status response: $($RemovalResults.Content)"
@@ -422,7 +422,7 @@ Function Restore-ESIndexFromSnapShot {
                 if($IndicesToRestore){ Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Restoring selected indices $($IndicesToRestore -join ',') from snapshot $SnapshotName to repository $SnapshotRepository..." }
                 else{ Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Restoring all indices from snapshot $SnapshotName to repository $SnapshotRepository..." }
                 
-                $SnapShotState = Invoke-RestMethod -Method Post -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -ErrorAction Stop
+                $SnapShotState = Invoke-RestMethod -Method Post -Uri $FullUri -ContentType 'application/json' -Body $jsonbody -UseBasicParsing -ErrorAction Stop
                 
                 Write-Verbose "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - Restored Shards: Total: $($SnapShotState.snapshot.shards.total), failed: $($SnapShotState.snapshot.shards.failed), successful: $($SnapShotState.snapshot.shards.successful)"
             }
@@ -443,7 +443,7 @@ Function Get-ESRunningSnapshots{
     
     if((Get-ESSnapshotRepository).Name -contains $SnapshotRepository){
         try{
-            $runningSnapsList = Invoke-RestMethod -Method Get -Uri $FullUri -ContentType 'application/json' -ErrorAction Stop
+            $runningSnapsList = Invoke-RestMethod -Method Get -Uri $FullUri -ContentType 'application/json' -UseBasicParsing -ErrorAction Stop
             if($runningSnapsList.snapshots.count -gt 0){
                 $runningSnapsList.snapshots
             }
@@ -459,7 +459,7 @@ Function Get-ESData{
         $DSLQuery
     )
 
-    $SearchResults = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_search" -Method Post -Body $DSLQuery -ContentType "application/json").Content)
+    $SearchResults = (ConvertFrom-Json -InputObject (Invoke-WebRequest -Uri "$ElasticSearchUri/_search" -Method Post -Body $DSLQuery -ContentType "application/json" -UseBasicParsing).Content)
     
     New-Object PSObject -Property @{
         'Total' = $SearchResults.hits.total
