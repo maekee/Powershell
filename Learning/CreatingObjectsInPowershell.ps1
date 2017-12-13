@@ -34,7 +34,18 @@
       ComputerName = $env:COMPUTERNAME
       ComputerModel = (gwmi win32_computersystem).Model
       'Logged-on User' = $env:USERNAME
+      MyGitHub = 'https://github.com/maekee'
   }
+
+#Maybe you want to add a cool method to this Object or another property.
+#Add the VisitWebSite method like this:
+$NewObject | Add-Member -MemberType ScriptMethod -Name VisitWebSite -Value { Start-Process -FilePath $this.MyGitHub }
+#Then just call the method with:
+$NewObject.VisitWebSite()
+
+#Maybe you want another property, easy.. just like this:
+$NewObject | Add-Member -MemberType NoteProperty -Name DomainName -Value $($env:USERDOMAIN)
+
 #endregion
 
 #region Creating a custom object with Select-Object
