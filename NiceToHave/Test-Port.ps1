@@ -29,3 +29,7 @@
     }
     End{ $Results }
 } 
+
+#Update 7/3 2018
+#You can also use cmdlet Test-NetConnection if you want to test TCP and have that cmdlet available:
+#https://docs.microsoft.com/en-us/powershell/module/nettcpip/test-netconnection?view=win10-ps
