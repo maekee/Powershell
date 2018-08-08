@@ -17,4 +17,8 @@ catch { Write-Warning "This time the exception was $($_.Exception.GetType().Full
         catch {}
 } | Select FullName
 
+#If an exception already is thrown and its inside the $error variable.
+#You can see the type with:
+$error[x].Exception.GetType().FullName
+
 #Happy exception hunting
