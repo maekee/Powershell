@@ -15,7 +15,8 @@ Function Set-Action {
 #Using What if, Set-Action -Object1 myObj -WhatIf
 #returns: What If: Performing the operation "Set-Action" on target "myObj".
 
-#You can also specify what action you want to include in the message by using two arguments when calling the ShouldProcess method:
+#You can also specify what action you want to include in the message by using two arguments when calling the ShouldProcess method
+#This will return: What If: Performing the operation "Setting" on target "myObj".
 
 #Example 2:
 Function Set-Action {
@@ -25,8 +26,3 @@ Function Set-Action {
     "Setting Action on $Object1"
   }
 }
-
-#When executing the WhatIf parameter the resulting text will be:
-#What If: Performing the operation "Setting" on target "myObj".
-
-#So enjoy WhatIffing...
