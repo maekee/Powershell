@@ -1,4 +1,5 @@
 #Small function to find ip addresses and replace with your own value
+#Can be useful if you want to post logs to a forum and dont want to expore public IPs.
 
 Function Replace-IPAddresses{
     [CmdletBinding()]
