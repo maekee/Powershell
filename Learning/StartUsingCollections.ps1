@@ -1,12 +1,31 @@
+## Updated 31/10 2019
+#Just found out that Microsoft do not recommend using ArrayLists for new development in dotnet, they now
+#recommend using the generic List<T> class. So i will add some examples below.
+# https://github.com/dotnet/platform-compat/blob/master/docs/DE0006.md
+
 #One of the most common ways of creating arrays today are the $array += "newvalue"
 #My take on this is, if its not just a few small values, stop using it now.
-#I present to you.. the Arraylist.
+#There are better alternatives.
 
-#With the Arraylist you can use better looking code and will get a major performance improvements.
-#Because Arrays are fixed sized from .NET powershell does a work around with this by basically
-#creating a new array for every += and throwing away the old array. This is not so nice when talking
-#performance. Arraylists are a much easier way and very easy to do.
-#You define a arraylist like this:
+#Because Arrays are fixed sized in dot net, powershell does a work-around with this by basically
+#creating a new array for every new item added with += and throwing away the old array.
+#This is not optimal when talking performance. Hash tables and Lists are a much easier way and
+#very easy to do. You define a string collections list like this:
+
+#With the Collections list you can use better looking code and will get a major performance improvements instead of using arrays.
+#Lets define a Collections list of strings:
+$stringList = New-Object System.Collections.Generic.List[string]
+
+#or why not a integer list:
+$intList = New-Object System.Collections.Generic.List[int]
+
+#Now add a string value:
+$stringList.Add("stringOne")
+
+
+#Microsoft no longer recommends using Arraylits, of different reasons. See links below:
+#See remarks: https://docs.microsoft.com/en-us/dotnet/api/system.collections.arraylist?view=netframework-4.8
+#Arraylists can be defined like this:
 $arraylist = New-Object System.Collections.ArrayList
 
 #Now you can add new items to the arraylist just like a hashtable with the Add method. Like this:
