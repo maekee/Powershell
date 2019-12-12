@@ -4,7 +4,7 @@
 Function HelloBool{
   param([bool]$someboolvalue)
   
-  if($PSBoundParameters.ContainsKey('someboolvalue'){
+  if($PSBoundParameters.ContainsKey('someboolvalue')){
     if($someboolvalue){
       Write-Host "someboolValue was given the value $true"
     }
