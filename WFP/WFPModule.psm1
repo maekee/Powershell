@@ -27,17 +27,18 @@ Function Get-WFPEvents{
         LASTEDIT: 2020-04-13
         VERSION: 1.0
         PREREQUISITE: Admin permission to read from the Security event log
-        CHANGELOG: 1.0 - Initial Release
+        CHANGELOG: 1.0.0 - Initial Release
+                   1.1.0 - Fixed bug where netsh wfp-command throwed exception random times. Think it was because i stored in clipboard, so i saved to file instead
     #>
     [CmdletBinding()]
     param(
-        [datetime]$StartDate = (Get-Date).AddHours(-1),
-        [datetime]$EndDate = (Get-Date),
+        [Parameter(Mandatory=$false)][datetime]$StartDate = (Get-Date).AddHours(-1),
+        [Parameter(Mandatory=$false)][datetime]$EndDate = (Get-Date),
         [ValidateSet('Inbound','Outbound','Everything')]$Direction = 'Everything',
-        [switch]$SkipICMP,
-        [switch]$SkipWebBrowsers,
-        [switch]$SkipBroadCastMultiCastAndSSDP,
-        [switch]$SkipIPHTTPSInterface
+        [Parameter(Mandatory=$false)][switch]$SkipICMP,
+        [Parameter(Mandatory=$false)][switch]$SkipWebBrowsers,
+        [Parameter(Mandatory=$false)][switch]$SkipBroadCastMultiCastAndSSDP,
+        [Parameter(Mandatory=$false)][switch]$SkipIPHTTPSInterface
     )
 
     #region Build EventLog filters and get events to $EventsFound
@@ -62,24 +63,37 @@ Function Get-WFPEvents{
         #endregion
 
         #region Get current WinFW filters (rules) and add them to hash table
-            [xml]$currentWinFWfilters = netsh wfp show filters -
-            $currentWinFWfiltersHash = @{}
-            $currentWinFWfilters.wfpdiag.filters.item | foreach {
-                [void]$currentWinFWfiltersHash.Add($_.filterId,"$($_.displayData.name)" )
-            }
+            try{
+                Write-Verbose -Message "Getting current active network filters from Windows Filtering Platform..."
+                $tmp1fil = [System.IO.Path]::GetTempFileName()
+                netsh wfp show filters $tmp1fil | Out-Null
+                [xml]$currentWinFWfilters = Get-Content -Path $tmp1fil
+
+                $currentWinFWfiltersHash = @{}
+                $currentWinFWfilters.wfpdiag.filters.item | foreach {
+                    if($_.filterId -ne $null){ [void]$currentWinFWfiltersHash.Add($_.filterId,"$($_.displayData.name)" ) }
+                }
+                
+                Remove-Item -Path $tmp1fil -Force
+                }
+            catch{ Write-Warning "Exception occurred while getting Windows Filtering Platform filters (rules). Exception: $($_.Exception.Message)" }
         #endregion
 
         #region Get current Layer info and add them to hash table
             try{
-                [xml]$currentWinFWstate = netsh wfp show state -
+                Write-Verbose -Message "Getting current active network filters from Windows Filtering Platform..."
+                $tmp2fil = [System.IO.Path]::GetTempFileName()
+                netsh wfp show state $tmp2fil | Out-Null
+                [xml]$currentWinFWstate = Get-Content -Path $tmp2fil
+
                 $currentWinFWstateHash = @{}
                 $currentWinFWstate.wfpstate.layers.Item.layer | foreach {
-                    if($_.layerId){
-                        [void]$currentWinFWstateHash.Add($_.layerId,"$($_.displayData.name)" )
-                    }
+                    if($_.layerId){ [void]$currentWinFWstateHash.Add($_.layerId,"$($_.displayData.name)" ) }
                 }
+                
+                Remove-Item -Path $tmp2fil -Force
             }
-            catch{}
+            catch{ Write-Warning "Exception occurred while getting Windows Filtering Platform State. Exception: $($_.Exception.Message)" }
         #endregion
 
         #region Get Current Addresses
@@ -255,8 +269,8 @@ Function Set-WFPLogging{
     #>
     [CmdletBinding()]
     param(
-        [bool]$Success,
-        [bool]$Failure
+        [Parameter(Mandatory=$true)][bool]$Success,
+        [Parameter(Mandatory=$true)][bool]$Failure
     )
     #Enabling audit logs may drown you in Event Log data, enabling only failure audits, and possibly only connection failures will reduce the number of log entries. Be selective about what you actually need
 
