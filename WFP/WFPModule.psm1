@@ -24,11 +24,12 @@ Function Get-WFPEvents{
         Post-filter to remove IP HTTPS Interface events from the result list
     .NOTES
         AUTHOR: Micke Sundqvist
-        LASTEDIT: 2020-04-13
+        LASTEDIT: 2020-04-14
         VERSION: 1.0
         PREREQUISITE: Admin permission to read from the Security event log
         CHANGELOG: 1.0.0 - Initial Release
                    1.1.0 - Fixed bug where netsh wfp-command throwed exception random times. Think it was because i stored in clipboard, so i saved to file instead
+		   1.2.0 - Added a bit of error handling, because an ordinary user cannot read the security by default.
     #>
     [CmdletBinding()]
     param(
@@ -50,10 +51,14 @@ Function Get-WFPEvents{
         }
 
         Write-Verbose -Message "Getting events from security log between $($StartDate.ToString("yyyy-MM-dd HH:mm:ss")) and $($EndDate.ToString("yyyy-MM-dd HH:mm:ss"))..."
-        $EventsFound = Get-WinEvent -FilterHashTable $EventFilters -ErrorAction SilentlyContinue -Verbose:$false
-        if($EventsFound.Count -gt 0){
-            Write-Verbose -Message "Found $($EventsFound.Count) events"
+        try{
+            $EventsFound = Get-WinEvent -FilterHashTable $EventFilters -ErrorAction SilentlyContinue -Verbose:$false
+
+            if($EventsFound.Count -gt 0){
+                Write-Verbose -Message "Found $($EventsFound.Count) events"
+            }
         }
+        catch{ Write-Warning "Error occurred while getting windows security event logs from $($env:COMPUTERNAME), make sure you have the correct permissions in the security event log" }
     #endregion
 
     if($EventsFound){
