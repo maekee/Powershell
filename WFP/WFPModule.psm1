@@ -86,7 +86,7 @@ Function Get-WFPEvents{
 
         #region Get current Layer info and add them to hash table
             try{
-                Write-Verbose -Message "Getting current active network filters from Windows Filtering Platform..."
+                Write-Verbose -Message "Getting current active network state from Windows Filtering Platform..."
                 $tmp2fil = [System.IO.Path]::GetTempFileName()
                 netsh wfp show state $tmp2fil | Out-Null
                 [xml]$currentWinFWstate = Get-Content -Path $tmp2fil
