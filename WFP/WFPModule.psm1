@@ -1,6 +1,3 @@
-#These functions are used to troubleshoot the Windows Firewall by enabling audit event logs for the Windows Filtering Platform.
-#I wrote this function because when we are troubleshooting the Windows Firewall we dont see everything, hopefully this helps.
-
 Function Get-WFPEvents{
     <# 
     .SYNOPSIS
@@ -86,7 +83,7 @@ Function Get-WFPEvents{
 
         #region Get current Layer info and add them to hash table
             try{
-                Write-Verbose -Message "Getting current active network state from Windows Filtering Platform..."
+                Write-Verbose -Message "Getting current active network filters from Windows Filtering Platform..."
                 $tmp2fil = [System.IO.Path]::GetTempFileName()
                 netsh wfp show state $tmp2fil | Out-Null
                 [xml]$currentWinFWstate = Get-Content -Path $tmp2fil
@@ -151,8 +148,8 @@ Function Get-WFPEvents{
                     #region Add EventId and EventType
                         $currHash.Add("EventID",$_.System.EventID)
 
-                        if($_.System.EventID -eq "5152"){$EventType = "DROP  - Packet dropped by WPF"}
-                        elseif($_.System.EventID -eq "5153"){$EventType = "VETO  - Packet vetoed by WPF"}
+                        if($_.System.EventID -eq "5152"){$EventType = "DROP  - Packet dropped by WFP"}
+                        elseif($_.System.EventID -eq "5153"){$EventType = "VETO  - Packet vetoed by WFP"}
                         elseif($_.System.EventID -eq "5154"){$EventType = "ALLOW - Listen permitted"}
                         elseif($_.System.EventID -eq "5155"){$EventType = "BLOCK - Listen blocked"}
                         elseif($_.System.EventID -eq "5156"){$EventType = "ALLOW - Connection permitted"}
