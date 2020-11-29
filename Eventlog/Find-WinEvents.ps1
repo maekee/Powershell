@@ -1,7 +1,7 @@
 Function Find-WinEvents {
     [CmdletBinding()]
     param(
-        [string[]]$EventLogs = "Security", #(Get-EventLog -List).Log,
+        [string[]]$EventLogs = (Get-EventLog -List).Log,
         [datetime]$StartTime = [datetime]::Now.AddHours(-1),
         [datetime]$EndTime = [datetime]::Now,
         [int[]]$EventIDs,
