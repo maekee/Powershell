@@ -11,21 +11,21 @@ Function Find-WinEvents {
 
     $ElapsedTime = [System.Diagnostics.Stopwatch]::StartNew()
 
-    Write-Verbose -Message "EventLogs: $($EventLogs -join ", ")" -Verbose
-    Write-Verbose -Message "Start Time: $($StartTime.ToString("yyyy-MM-dd HH:mm:ss"))" -Verbose
-    Write-Verbose -Message "End Time: $($EndTime.ToString("yyyy-MM-dd HH:mm:ss"))" -Verbose
+    Write-Verbose -Message "EventLogs: $($EventLogs -join ", ")"
+    Write-Verbose -Message "Start Time: $($StartTime.ToString("yyyy-MM-dd HH:mm:ss"))"
+    Write-Verbose -Message "End Time: $($EndTime.ToString("yyyy-MM-dd HH:mm:ss"))"
 
     $GetWinEventFilterHashTable = @{"StartTime" = $StartTime;EndTime = $EndTime}
     if($EventIDs){
-        Write-Verbose -Message "Event IDs: $($EventIDs -join ", ")" -Verbose
+        Write-Verbose -Message "Event IDs: $($EventIDs -join ", ")"
         [void]$GetWinEventFilterHashTable.Add("ID",$EventID -join ",")
     }
 
-    if($RegExSearchString){ Write-Verbose -Message "Search String: `"$RegExSearchString`"" -Verbose }
-    if($MaxEventsPerLog){ Write-Verbose -Message "Max Events per EventLog: $MaxEventsPerLog" -Verbose }
+    if($RegExSearchString){ Write-Verbose -Message "Search String: `"$RegExSearchString`"" }
+    if($MaxEventsPerLog){ Write-Verbose -Message "Max Events per EventLog: $MaxEventsPerLog" }
 
     foreach($currLog in $EventLogs){
-        Write-Verbose -Message "Searching $($currLog) log..." -Verbose
+        Write-Verbose -Message "Searching $($currLog) log..."
 
         $GetWinEventArgs = @{}
         if($MaxEventsPerLog){ [void]$GetWinEventArgs.Add("MaxEvents",$MaxEventsPerLog) }
@@ -45,5 +45,5 @@ Function Find-WinEvents {
         }
     }
 
-    Write-Verbose -Message "Search completed in $($ElapsedTime.Elapsed.ToString())" -Verbose
+    Write-Verbose -Message "Search completed in $($ElapsedTime.Elapsed.ToString())"
 }
