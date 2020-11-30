@@ -40,7 +40,7 @@ Function Find-WinEvents {
         }
         catch{
             if($_.FullyQualifiedErrorId -match "NoMatchingEventsFound"){ continue }
-            elseif($_.Exception.Message -match "unauthorized operation"){ Write-Warning -Message "Validate that you run elevated and have permissions to view the `"$($currLog.ToLower())`" eventlog. Exception: $($_.Exception.Message)" }
+            elseif($_.Exception.Message -match "unauthorized operation" -or $_.Exception.InnerException.HResult -match "2147024891"){ Write-Warning -Message "Validate that you run elevated and have permissions to view the `"$($currLog.ToLower())`" eventlog. Exception: $($_.Exception.Message)" }
             else{ Write-Warning -Message "Error occcured. Exception: $($_.Exception.Message)" }
         }
     }
