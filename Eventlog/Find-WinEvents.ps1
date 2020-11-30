@@ -34,7 +34,15 @@ Function Find-WinEvents {
         else{ [void]$GetWinEventFilterHashTable.Add("LogName",$currLog) }
 
         [void]$GetWinEventArgs.Add("FilterHashtable",$GetWinEventFilterHashTable)
-        Get-WinEvent @GetWinEventArgs -ErrorAction SilentlyContinue -Verbose:$false | Where { $_.ToXml() -match $RegExSearchString }
+        
+        try{
+            Get-WinEvent @GetWinEventArgs -Verbose:$false -ErrorAction Stop | Where { $_.ToXml() -match $RegExSearchString }
+        }
+        catch{
+            if($_.FullyQualifiedErrorId -match "NoMatchingEventsFound"){ continue }
+            elseif($_.Exception.Message -match "unauthorized operation"){ Write-Warning -Message "Validate that you run elevated and have permissions to view the `"$($currLog.ToLower())`" eventlog. Exception: $($_.Exception.Message)" }
+            else{ Write-Warning -Message "Error occcured. Exception: $($_.Exception.Message)" }
+        }
     }
 
     Write-Verbose -Message "Search completed in $($ElapsedTime.Elapsed.ToString())" -Verbose
