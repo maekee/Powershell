@@ -27,12 +27,13 @@ Function Get-WFPEvents{
         CHANGELOG: 1.0.0 - Initial Release
                    1.1.0 - Fixed bug where netsh wfp-command throwed exception random times. Think it was because i stored in clipboard, so i saved to file instead
 		   1.2.0 - Added a bit of error handling, because an ordinary user cannot read the security by default.
+		   1.2.1 - Added a new Direction value (Forward) //2021-05-15
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$false)][datetime]$StartDate = (Get-Date).AddHours(-1),
         [Parameter(Mandatory=$false)][datetime]$EndDate = (Get-Date),
-        [ValidateSet('Inbound','Outbound','Everything')]$Direction = 'Everything',
+        [ValidateSet('Inbound','Outbound','Forward','Everything')]$Direction = 'Everything',
         [Parameter(Mandatory=$false)][switch]$SkipICMP,
         [Parameter(Mandatory=$false)][switch]$SkipWebBrowsers,
         [Parameter(Mandatory=$false)][switch]$SkipBroadCastMultiCastAndSSDP,
@@ -191,6 +192,7 @@ Function Get-WFPEvents{
                     #region Replace direction with friendly name value
                         if($currHash.Direction -match "14592"){$currHash.Direction = 'Inbound'}
                         elseif($currHash.Direction -match "14593"){$currHash.Direction = 'Outbound'}
+			elseif($currHash.Direction -match "14594"){$currHash.Direction = 'Forward'}
                     #endregion
 
                     #region Add Destination Address Type
@@ -231,6 +233,7 @@ Function Get-WFPEvents{
         #region Filter Direction
             if($Direction -eq "Inbound"){ $objects = $objects | Where {$_.Direction -eq "Inbound"} }
             if($Direction -eq "Outbound"){ $objects = $objects | Where {$_.Direction -eq "Outbound"} }
+	    if($Direction -eq "Forward"){ $objects = $objects | Where {$_.Direction -eq "Forward"} }
         #endregion
 
         #region Skip Multicast and Broadcasts
