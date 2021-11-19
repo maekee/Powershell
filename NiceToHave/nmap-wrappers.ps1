@@ -39,17 +39,6 @@ Function Get-HostState{
     Write-Verbose -Message "Nmap result: $($output.nmaprun.runstats.finished.summary)"
     Write-Verbose -Message "Resolved name: $($output.nmaprun.host.hostnames.hostname.name)"
 
-    <#
-    Online:
-    # Nmap 7.92 scan initiated Thu Nov 18 11:33:11 2021 as: "C:\\Program Files (x86)\\Nmap\\nmap.exe" -sn -T5 -oG - 192.168.100.1
-    Host: 192.168.100.1 (SERVERNAME.domain.com)	Status: Up
-    # Nmap done at Thu Nov 18 11:33:11 2021 -- 1 IP address (1 host up) scanned in 0.06 seconds
-
-    Offline:
-    # Nmap 7.92 scan initiated Thu Nov 18 11:38:01 2021 as: "C:\\Program Files (x86)\\Nmap\\nmap.exe" -sn -T5 -oG - 192.168.100.1
-    # Nmap done at Thu Nov 18 11:38:03 2021 -- 1 IP address (0 hosts up) scanned in 1.55 seconds
-    #>
-
     if($output.nmaprun.runstats.hosts.up -eq 1){$true}
     elseif($output.nmaprun.runstats.hosts.down -eq 1){$false}
     else{Write-Warning -Message "Neither up or down!? $(($output.nmaprun.runstats.hosts | Select @{Name="Hosts";expression={"up $($_.up), down $($_.down), total $($_.total)"}}).Hosts)"}
