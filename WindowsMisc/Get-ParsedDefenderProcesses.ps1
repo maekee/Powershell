@@ -42,4 +42,7 @@ Examples
 Get-ParsedDefenderProcesses | ft
 Get-ParsedDefenderProcesses | Group-Object ProcessImageName | Sort Count -Descending | Select -First 15
 Get-ParsedDefenderProcesses | Where {$_.EstimatedImpact -gt "50" -and $_.MaxTimeFile -notmatch "\\Windows\\System32\\"} | Sort EstimatedImpact -Descending | ft ProcessImageName,EstimatedImpact,TotalTime,CountValue,MaxTimeFile
+
+Further troubleshooting in need:
+https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/troubleshoot-performance-issues?view=o365-worldwide
 #>
