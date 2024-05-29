@@ -4,8 +4,8 @@
 # If you Disconnect the Com Object and start OneNote again, works fine.
 # So there is a conflict between the Com Object process and the process started by the user
 
-# To work around this, we check that the ONENOTE process is not running when Connecting the Com Object.
-# Then when we are done, we just run Disconnect-OneNote
+# To work around this, we can check that no ONENOTE.exe process is running before Connecting the Com Object.
+# Then when we are done, we just run Disconnect-OneNote.
 
 Function Connect-OneNote {
     [CmdletBinding()]
