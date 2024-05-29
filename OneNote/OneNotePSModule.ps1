@@ -12,7 +12,8 @@ Function Connect-OneNote {
         }
     }
 
-    if($OneNote -and $OneNote.GetType().FullName -eq "Microsoft.Office.Interop.OneNote.Application2Class"){
+    #Below logic checks that OneNote variable exists, is of correct type and the Windows Property is not empty (Com Object lost)
+    if( $OneNote -and $OneNote.GetType().FullName -eq "Microsoft.Office.Interop.OneNote.Application2Class" -and $null -ne $OneNote.Windows){
         #Write-Verbose -Message "OneNote variable already present"
     }
     else{
@@ -27,12 +28,11 @@ Function Connect-OneNote {
     if($OneNote -and $OneNote.GetType().FullName -eq "Microsoft.Office.Interop.OneNote.Application2Class"){$true}
     else{$false}
 }
-
 Function Disconnect-OneNote {
     if($OneNote){
         try{
             [System.Runtime.InteropServices.Marshal]::ReleaseComObject($OneNote) | Out-Null
-            Remove-Variable OneNote -ErrorAction SilentlyContinue
+            Remove-Variable OneNote -Scope Global -ErrorAction SilentlyContinue
         }
         catch{
             Write-Warning -Message "Error occurred while disconnecting (releasing) Com Object to OneNote"
@@ -77,7 +77,6 @@ Function Get-OneNoteNotebook {
         Write-Warning -Message "Error occurred while getting OneNote Notebooks. Exception: $($_.Exception.Message)"
     }
 }
-
 Function Sync-OneNoteNotebook {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][string]$NoteBookID)
@@ -125,7 +124,6 @@ Function Close-OneNoteNotebook {
         Write-Warning -Message "Notebook with ID $NoteBookID not not found"
     }
 }
-
 Function Connect-OneNoteNotebook {
     [CmdletBinding()]
     param([Parameter(Mandatory=$true)][string]$NoteBookUrl)
