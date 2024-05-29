@@ -86,29 +86,6 @@ Function Get-OneNoteNotebook {
         Write-Warning -Message "Error occurred while getting OneNote Notebooks. Exception: $($_.Exception.Message)"
     }
 }
-Function Sync-OneNoteNotebook {
-    [CmdletBinding()]
-    param([Parameter(Mandatory=$true)][string]$NoteBookID)
-
-    if((Connect-OneNote) -eq $false){Write-Warning "OneNote Class variable missing";break}
-
-    #Check presence of Notebook
-    $OneNoteNotebookObj = Get-OneNoteNotebook -Identity $NoteBookID
-    if($OneNoteNotebookObj){
-        Write-Verbose -Message "Found Notebook `"$($OneNoteNotebookObj.name)`" with ID `"$($OneNoteNotebookObj.ID)`""
-
-        try{
-            $OneNote.SyncHierarchy($NoteBookID)
-            Write-Verbose -Message "Successfully triggered a Sync of OneNote Notebook `"$($OneNoteNotebookObj.name)`" ($($OneNoteNotebookObj.nickname)) with ID `"$($OneNoteNotebookObj.ID)`""
-        }
-        catch{
-            Write-Warning -Message "Failed to sync Notebook `"$($OneNoteNotebookObj.name)`" ($($OneNoteNotebookObj.nickname)) with ID `"$($OneNoteNotebookObj.ID)`". Exception: $($_.Exception.Message)"
-        }
-    }
-    else{
-        Write-Warning -Message "Notebook with ID $NoteBookID not not found"
-    }
-}
 
 Function Close-OneNoteNotebook {
     [CmdletBinding()]
@@ -151,6 +128,36 @@ Function Connect-OneNoteNotebook {
     }
 }
 
+Function Sync-OneNoteNotebook {
+    [CmdletBinding()]
+    param([Parameter(Mandatory=$true)][string]$NoteBookID)
+
+    if((Connect-OneNote) -eq $false){Write-Warning "OneNote Class variable missing";break}
+
+    #Check presence of Notebook
+    $OneNoteNotebookObj = Get-OneNoteNotebook -Identity $NoteBookID
+    if($OneNoteNotebookObj){
+        Write-Verbose -Message "Found Notebook `"$($OneNoteNotebookObj.name)`" with ID `"$($OneNoteNotebookObj.ID)`""
+
+        try{
+            $OneNote.SyncHierarchy($NoteBookID)
+            Write-Verbose -Message "Successfully triggered a Sync of OneNote Notebook `"$($OneNoteNotebookObj.name)`" ($($OneNoteNotebookObj.nickname)) with ID `"$($OneNoteNotebookObj.ID)`""
+        }
+        catch{
+            Write-Warning -Message "Failed to sync Notebook `"$($OneNoteNotebookObj.name)`" ($($OneNoteNotebookObj.nickname)) with ID `"$($OneNoteNotebookObj.ID)`". Exception: $($_.Exception.Message)"
+        }
+    }
+    else{
+        Write-Warning -Message "Notebook with ID $NoteBookID not not found"
+    }
+}
+
+Function Get-OneNoteVersion {
+    $regKey = Get-Item -Path "HKCU:\Software\Microsoft\Office\16.0\OneNote\OpenNotebooks"
+    if($regKey.Name -match "Office\\(\d\d\.\d)"){$Matches.1}
+}
+
+#Backup-OneNoteNotebook executes with asynchronous communication, so continues to happen in the background
 Function Backup-OneNoteNotebook {
     [CmdletBinding()]
     param(
@@ -160,7 +167,7 @@ Function Backup-OneNoteNotebook {
 
     if((Connect-OneNote) -eq $false){Write-Warning "OneNote Class variable missing";break}
 
-    #Adds subfolder with timestamp, if this is commented off onenote-backups are placed in ExportFolder
+    # Add subfolder with timestamp, if this is commented off onenote-backups are placed in ExportFolder
     $ExportFolder = Join-Path $ExportFolder -ChildPath $((Get-Date).ToString("yyyyMMdd-HHmmss"))
 
     if($PSBoundParameters.ContainsKey('Identity')){ $noteBookArray = @(Get-OneNoteNotebook -Identity $Identity) }
@@ -180,7 +187,9 @@ Function Backup-OneNoteNotebook {
         #region Backup OneNote Notebooks
             try{
                 foreach($currOneNoteNoteBook in $noteBookArray){
-                    $currNotebookPath = Join-Path -Path $ExportFolder -ChildPath "$($currOneNoteObj.name).onepkg"
+                    Write-Verbose -Message "Backing up $($currOneNoteNoteBook.name).. this can take a while"
+
+                    $currNotebookPath = Join-Path -Path $ExportFolder -ChildPath "$($currOneNoteNoteBook.name).onepkg"
                     $OneNote.Publish($currOneNoteNoteBook.ID, $currNotebookPath, 1) #1 = .onepkg
                 }
             }
@@ -188,5 +197,8 @@ Function Backup-OneNoteNotebook {
                 Write-Warning -Message "Error occurred while backing up OneNote Notebook $($currOneNoteNoteBook.name) to $ExportFolder. Exception: $($_.exception.Message)"
             }
         #endregion
+    }
+    else{
+        Write-Verbose -Message "No OneNote notebook found"
     }
 }
