@@ -28,7 +28,19 @@ Function Connect-OneNote {
     else{$false}
 }
 
-Function Get-OneNot"Diagnostics\ONENOTE"eNotebook {
+Function Disconnect-OneNote {
+    if($OneNote){
+        try{
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($OneNote) | Out-Null
+            Remove-Variable OneNote -ErrorAction SilentlyContinue
+        }
+        catch{
+            Write-Warning -Message "Error occurred while disconnecting (releasing) Com Object to OneNote"
+        }
+    }
+}
+
+Function Get-OneNoteNotebook {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$false)][string]$Identity
