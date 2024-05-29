@@ -1,3 +1,12 @@
+# When running Connect-OneNote a new Com Object is initiated (ONENOTE.exe process started)
+# If you try to start OneNote manually when this Com Object is established you will get
+# a popup windows saying: "OneNote is cleaning up from the last time it was open" and then that OneNote cannot be opened.
+# If you Disconnect the Com Object and start OneNote again, works fine.
+# So there is a conflict between the Com Object process and the process started by the user
+
+# To work around this, we check that the ONENOTE process is not running when Connecting the Com Object.
+# Then when we are done, we just run Disconnect-OneNote
+
 Function Connect-OneNote {
     [CmdletBinding()]
     param([switch]$Reload)
