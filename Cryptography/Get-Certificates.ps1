@@ -1,4 +1,4 @@
- Function Get-Certificates{
+Function Get-Certificates{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, HelpMessage="CASERVER\CAName, run 'certutil -getconfig' on issuing CA to get Config string")]
@@ -31,10 +31,11 @@
         $ReqIDAttr = $CaView.GetColumnIndex($false, "Request ID")
         $CertTempAttr = $CaView.GetColumnIndex($false, "Certificate Template")
 
-        if($IncludeBinaryCertificate){ $RequesterNameAttr = $CaView.GetColumnIndex($false, "Binary Certificate") }
+        if($IncludeBinaryCertificate){ $BinaryCertAttr = $CaView.GetColumnIndex($false, "Binary Certificate") }
 
         $CommonNameAttr, $NotAfterAttr, $DNAttr, $DispositionAttr, $CertExpAttr, $CertEffecAttr, $ReqIDAttr, $CertTempAttr | Foreach{ $CAView.SetResultColumn($_) }
 
+        if($IncludeBinaryCertificate){ $CAView.SetResultColumn($BinaryCertAttr) }
     #endregion
 
     #region CAView filters
@@ -97,4 +98,4 @@
     Until ($Rowobj.Next() -eq -1 )
 
     $CurrentList
-} 
+}
