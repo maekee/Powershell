@@ -28,7 +28,7 @@ Function New-WindowsPopup {
     param(
         [Parameter(Mandatory=$true, Position=0)][ValidateNotNullOrEmpty()]$Text,
         [Parameter(Mandatory=$false, Position=1)]$Title = "Information",
-        [Parameter(Mandatory=$false, Position=3)][ValidateSet('OkOnly','OKCancel','YesNoCancel','YesNo','Critical','Question','Exclamation','Information','MsgBoxHelp')][string]$MessageStyle = "OK"
+        [Parameter(Mandatory=$false, Position=2)][ValidateSet('OkOnly','OKCancel','YesNoCancel','YesNo','Critical','Question','Exclamation','Information','MsgBoxHelp')][string]$MessageStyle = "OK"
     )
 
 
