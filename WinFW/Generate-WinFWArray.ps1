@@ -1,11 +1,9 @@
 # This function parses the Windows Firewall Log, creates an array with objects in which you can filter and search.
 # Created this to help out colleagues that need an overview of traffic coming in to the WinFW.
 
-# Elevation is required to read WinFW logfiles!
+# This is version 2, more filter functionality pre building objects
 
-# If no LogPath parameter is supplied, the script will look in the registry for the Windows Firewall Log path
-# If logging is enabled per profile the default location is C:\WINDOWS\system32\LogFiles\Firewall
-# The Generate-WinFWArray defaults to the domain profile logfile
+# Elevation is required to read WinFW logfiles!
 
 # So make sure logging is enabled per Windows Firewall profile (domain, private, public)
 # Sorry about the missing comment based help.
@@ -13,45 +11,38 @@
 Function Generate-WinFWArray{
     [CmdletBinding()]
     param(
-        [string]$LogPath,
-        [switch]$OnlyIncomingTraffic,
-        [switch]$OnlyDenyTraffic
+        [Parameter(Mandatory=$true)][string]$LogPath,
+        [ValidateSet('All','OutboundOnly','InboundOnly')][string]$FilterDirection = "All",
+        [ValidateSet('All','TCP','UDP','ICMP')][string]$FilterProtocol = "All",
+        [ValidateSet('All','DROP','ALLOW')][string]$FilterAction = "All",
+        [switch]$SkipMulticast
     )
 
-    if($LogPath){
-        if(Test-Path $LogPath){$WinFWLogPath = $logpath}
-        else{ Write-Warning "`"$LogPath`" not found" }
-    }
-    else{
-        try{
-            $RegistryPath = (Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile\Logging" -ErrorAction Stop).LogFilePath
-            if($RegistryPath){ $WinFWLogPath = $RegistryPath }
-            else{ Write-Warning "Registry Windows Firewall log path autodetect failed." }
-        }
-        catch {
-            Write-Warning "Registry Windows Firewall log path autodetect failed."
-        }
-    }
+    if(Test-Path $LogPath){ $WinFWLogPath = $LogPath }
+    else{ Write-Warning "`"$LogPath`" not found" }
 
     if($WinFWLogPath){
         $resultList = New-Object System.Collections.ArrayList
 
         $FWLogContent = Get-Content $WinFWLogPath
 
-        if($OnlyIncomingTraffic){
-            Write-Verbose "Only Incoming (receive) log entrys"
-            $FWLogContent = $FWLogContent | Where {$_ -match "RECEIVE" }
-        }
+        if($FilterDirection -eq "OutboundOnly"){ $FWLogContent = $FWLogContent | Where {$_ -match "SEND" }}
+        if($FilterDirection -eq "InboundOnly"){ $FWLogContent = $FWLogContent | Where {$_ -match "RECEIVE" }}
 
-        if($OnlyDenyTraffic){
-            Write-Verbose "Only Deny log entrys"
-            $FWLogContent = $FWLogContent | Where {$_ -match "DROP" }
-        }
+        if($FilterProtocol -eq "TCP"){ $FWLogContent = $FWLogContent | Where {$_ -match "TCP" }}
+        if($FilterProtocol -eq "UDP"){ $FWLogContent = $FWLogContent | Where {$_ -match "UDP" }}
+        if($FilterProtocol -eq "ICMP"){ $FWLogContent = $FWLogContent | Where {$_ -match "ICMP" }}
 
-        if(!($OnlyIncomingTraffic -or $OnlyDenyTraffic)){
-            Write-Verbose "No comments or empty lines"
-            $FWLogContent = $FWLogContent | Where {$_ -notmatch "^#" -AND $_ -ne ""}
-        }
+        if($FilterAction -eq "DROP"){ $FWLogContent = $FWLogContent | Where {$_ -match "DROP" }}
+        if($FilterAction -eq "ALLOW"){ $FWLogContent = $FWLogContent | Where {$_ -match "ALLOW" }}
+
+        if($SkipMulticast){ $FWLogContent = $FWLogContent | Where {
+            $_ -notmatch "239\.255\.255\.250" -and
+            $_ -notmatch "255\.255\.255\.255" -and
+            $_ -notmatch "224\.0\.0\.22"
+        }}
+
+        $FWLogContent = $FWLogContent | Where {$_ -notmatch "^#" -AND $_ -ne ""}
 
         $i = 0
         foreach($row in $FWLogContent){
@@ -86,22 +77,3 @@ Function Generate-WinFWArray{
         if($resultList.Count -gt 1){Write-Verbose "Oldest Entry: $($resultList[0].DateObj.ToString("yyyy-MM-dd HH:mm:ss"))"}
     }
 }
-
-#Example
-$WinFWArrayList = Generate-WinFWArray -OnlyIncomingTraffic -Verbose
-
-$WinFWArrayList | Where {
-    $_."Dest_IP" -notmatch "^224.0" -AND
-    $_."Dest_IP" -ne "ff02::c" -AND
-    $_."Dest_IP" -ne "ff02::fb" -AND
-    $_."Dest_IP" -ne "::1" -AND
-    $_."Protocol" -ne "ICMP" -AND
-    $_."Dest_Port" -notmatch "3389|5355|1900|3702|5358|5357|2869|3702" -AND #RDP (3389), Network Discovery Ports
-    $_."Dest_Port" -notmatch "5985|5986" #PowerShell Remoting
-} | Group-Object "Dest_Port" | `
-        Select Count,
-        @{name="Port";expression={ $_.Name }},
-        @{name="Protocol";expression={ ($_.Group | Select "Protocol" -ExpandProperty "Protocol" | Group-Object | Select Count,Name | Sort Count -Descending).Name -join "," }},
-        @{name="Action";expression={ ($_.Group | Select "Action" -ExpandProperty "Action" | Group-Object | Select Count,Name | Sort Count -Descending).Name -join "," }},
-        @{name="Source_IP";expression={ $_.Group | Select "Source_IP" -ExpandProperty "Source_IP" | Group-Object | Select Count,Name | Sort Count -Descending }},
-        Group | Sort Count -Descending | ft -AutoSize
