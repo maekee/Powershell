@@ -1,6 +1,8 @@
 # This function parses the Windows Firewall Log, creates an array with objects in which you can filter and search.
 # Created this to help out colleagues that need an overview of traffic coming in to the WinFW.
 
+# Elevation is required to read WinFW logfiles!
+
 # If no LogPath parameter is supplied, the script will look in the registry for the Windows Firewall Log path
 # If logging is enabled per profile the default location is C:\WINDOWS\system32\LogFiles\Firewall
 # The Generate-WinFWArray defaults to the domain profile logfile
