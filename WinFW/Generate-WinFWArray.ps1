@@ -1,7 +1,7 @@
 # This function parses the Windows Firewall Log, creates an array with objects in which you can filter and search.
 # Created this to help out colleagues that need an overview of traffic coming in to the WinFW.
 
-# This is version 2, more filter functionality pre building objects
+# This is version 3, more filter functionality pre building objects
 
 # Elevation is required to read WinFW logfiles!
 
@@ -39,7 +39,8 @@ Function Generate-WinFWArray{
         if($SkipMulticast){ $FWLogContent = $FWLogContent | Where {
             $_ -notmatch "239\.255\.255\.250" -and
             $_ -notmatch "255\.255\.255\.255" -and
-            $_ -notmatch "224\.0\.0\.22"
+            $_ -notmatch "224\.0\.0\.22" -and
+            $_ -notmatch "224\.0\.0\.251"
         }}
 
         $FWLogContent = $FWLogContent | Where {$_ -notmatch "^#" -AND $_ -ne ""}
@@ -67,12 +68,13 @@ Function Generate-WinFWArray{
                 "Icmpcode" = $allEntrys[14]
                 "Info" = $allEntrys[15]
                 "Path" = $allEntrys[16]
+                "Pid" = $allEntrys[17]
             }
             [void]$resultList.Add($currentObj)
             $i++
         }
 
-        $resultList | Sort DateObj | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","TcpFlags","TcpSyn","TcpAck","TcpWin","IcmpType","Icmpcode","Info","Path"
+        $resultList | Sort DateObj | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","TcpFlags","TcpSyn","TcpAck","TcpWin","IcmpType","Icmpcode","Info","Path","Pid"
         Write-Verbose "Collected $($resultList.Count) entrys"
         if($resultList.Count -gt 1){Write-Verbose "Oldest Entry: $($resultList[0].DateObj.ToString("yyyy-MM-dd HH:mm:ss"))"}
     }
@@ -82,7 +84,7 @@ $PublicArray = Generate-WinFWArray -LogPath "C:\WINDOWS\system32\LogFiles\Firewa
 $PrivateArray = Generate-WinFWArray -LogPath "C:\WINDOWS\system32\LogFiles\Firewall\privatefw.log" -FilterDirection OutboundOnly
 
 $WinFWArrayList = New-Object System.Collections.ArrayList
-$PublicArray | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","IcmpType","Icmpcode","Info","Path",@{name="Profile";Expression={"Public"}} | foreach { [void]$WinFWArrayList.Add( $_ ) }
-$PrivateArray | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","IcmpType","Icmpcode","Info","Path",@{name="Profile";Expression={"Private"}} | foreach { [void]$WinFWArrayList.Add( $_ ) }
+$PublicArray | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","IcmpType","Icmpcode","Info","Path","pid",@{name="Profile";Expression={"Public"}} | foreach { [void]$WinFWArrayList.Add( $_ ) }
+$PrivateArray | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","IcmpType","Icmpcode","Info","Path","pid",@{name="Profile";Expression={"Private"}} | foreach { [void]$WinFWArrayList.Add( $_ ) }
 
 $WinFWArrayList | ft
