@@ -1,8 +1,12 @@
-#This function reads the Windows Firewall Log and creates an array with objects, which makes it possible to filter and search.
-#Created this to help out colleagues that need an overview of traffic coming in to the WinFW.
-#If no LogPath parameter is supplied, the script will look in the registry for the Windows Firewall Log path
-#Make sure you have enabled Windows Firewall Logging first, else nothing will be found.
-#No comment based help, dont have time for that right now.
+# This function parses the Windows Firewall Log, creates an array with objects in which you can filter and search.
+# Created this to help out colleagues that need an overview of traffic coming in to the WinFW.
+
+# If no LogPath parameter is supplied, the script will look in the registry for the Windows Firewall Log path
+# If logging is enabled per profile the default location is C:\WINDOWS\system32\LogFiles\Firewall
+# The Generate-WinFWArray defaults to the domain profile logfile
+
+# So make sure logging is enabled per Windows Firewall profile (domain, private, public)
+# Sorry about the missing comment based help.
 
 Function Generate-WinFWArray{
     [CmdletBinding()]
@@ -18,7 +22,7 @@ Function Generate-WinFWArray{
     }
     else{
         try{
-            $RegistryPath = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\SharedAccess\Defaults\FirewallPolicy\DomainProfile\Logging" -ErrorAction Stop).LogFilePath
+            $RegistryPath = (Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile\Logging" -ErrorAction Stop).LogFilePath
             if($RegistryPath){ $WinFWLogPath = $RegistryPath }
             else{ Write-Warning "Registry Windows Firewall log path autodetect failed." }
         }
