@@ -77,3 +77,12 @@ Function Generate-WinFWArray{
         if($resultList.Count -gt 1){Write-Verbose "Oldest Entry: $($resultList[0].DateObj.ToString("yyyy-MM-dd HH:mm:ss"))"}
     }
 }
+
+$PublicArray = Generate-WinFWArray -LogPath "C:\WINDOWS\system32\LogFiles\Firewall\publicfw.log" -FilterDirection OutboundOnly
+$PrivateArray = Generate-WinFWArray -LogPath "C:\WINDOWS\system32\LogFiles\Firewall\privatefw.log" -FilterDirection OutboundOnly
+
+$WinFWArrayList = New-Object System.Collections.ArrayList
+$PublicArray | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","IcmpType","Icmpcode","Info","Path",@{name="Profile";Expression={"Public"}} | foreach { [void]$WinFWArrayList.Add( $_ ) }
+$PrivateArray | Select "Date","Time","DateObj","Action","Protocol","Source_IP","Dest_IP","Source_Port","Dest_Port","Size","IcmpType","Icmpcode","Info","Path",@{name="Profile";Expression={"Private"}} | foreach { [void]$WinFWArrayList.Add( $_ ) }
+
+$WinFWArrayList | ft
